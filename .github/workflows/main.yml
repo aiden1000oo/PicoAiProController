@@ -12,16 +12,16 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
 
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake gcc-arm-none-eabi build-essential git
 
-    - name: Fetch Pico SDK
+    - name: Fetch Pico SDK (with TinyUSB)
       run: |
-        git clone --depth 1 https://github.com/raspberrypi/pico-sdk.git
+        git clone --depth 1 --recurse-submodules https://github.com/raspberrypi/pico-sdk.git
         echo "PICO_SDK_PATH=$GITHUB_WORKSPACE/pico-sdk" >> $GITHUB_ENV
 
     - name: Configure CMake
@@ -31,7 +31,7 @@ jobs:
       run: cmake --build build --parallel
 
     - name: Upload UF2 artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: pico_ai_pro_controller
         path: build/*.uf2
