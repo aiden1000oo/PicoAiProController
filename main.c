@@ -2,20 +2,21 @@
 #include "tusb.h"
 #include "model_data.h"
 #include "tflm_micro_interpreter.h"
+#include <string.h>
 
 typedef struct {
     uint16_t buttons;
     uint8_t  hat;
     uint8_t  lx, ly;
     uint8_t  rx, ry;
-} __attribute__((packed)) switch_report_t;
+} __attribute__((packed)) procon_report_t;
 
 static uint32_t ai_timer = 0;
 
 void ai_controller_task(void) {
     if (!tud_hid_ready()) return;
-    switch_report_t rpt = {0};
 
+    procon_report_t rpt = {0};
     ai_timer++;
     if (ai_timer % 100 == 0) {
         int8_t input[2] = { (int8_t)(ai_timer & 0xFF), (int8_t)(rand() & 0xFF) };
@@ -27,17 +28,20 @@ void ai_controller_task(void) {
         for (int i=1;i<3;i++) if (output[i] > maxv) { choice = i; maxv = output[i]; }
 
         if (choice == 0) {
-            rpt.buttons |= (1 << 0); // A button
+            rpt.buttons |= (1 << 0); // A
             rpt.lx = 0xFF; rpt.ly = 0x80;
         } else if (choice == 1) {
-            rpt.buttons |= (1 << 1); // B button
-            rpt.ly = 0x00; // jump-ish
+            rpt.buttons |= (1 << 1); // B
+            rpt.ly = 0x00;
         } else {
-            rpt.hat = GAMEPAD_HAT_DOWN; // taunt
+            rpt.hat = 0x04; // down
         }
     }
 
-    tud_hid_report(0, &rpt, sizeof(rpt));
+    // Send 64-byte report (Switch requires full size)
+    uint8_t buf[64] = {0};
+    memcpy(buf, &rpt, sizeof(rpt));
+    tud_hid_report(0, buf, sizeof(buf));
 }
 
 int main() {
