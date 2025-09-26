@@ -1,4 +1,4 @@
-name: Build Pico AI Pro Controller
+name: Build Pico AI Pro Controllerr
 
 on:
   push:
