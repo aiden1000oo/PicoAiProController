@@ -92,7 +92,7 @@ uint8_t const * tud_descriptor_configuration_cb(uint8_t index) {
 char const* string_desc_arr[] = {
     (const char[]) {0x09, 0x04},
     "Nintendo Co., Ltd.",
-    "Pro Controller AI",
+    "Pro Controller",
     "00000001",
 };
 
